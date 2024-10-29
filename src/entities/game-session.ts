@@ -10,8 +10,8 @@ import {
 import { Game } from './game';
 import { UserProgressDto } from '../dto';
 
-@Entity('participants')
-export class GameProgress {
+@Entity('gameSessions')
+export class GameSession {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -21,7 +21,7 @@ export class GameProgress {
   @Column({ type: 'json', nullable: false })
   secondUserProgress: UserProgressDto;
 
-  @OneToOne(() => Game, (game) => game.gameProgress)
+  @OneToOne(() => Game, (game) => game.gameSession)
   game: Game;
 
   @CreateDateColumn()

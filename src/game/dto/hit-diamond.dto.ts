@@ -1,8 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class FieldCoordinatesDto {
+export class HitDiamondDto {
   @ApiProperty()
   x: number;
+
   @ApiProperty()
   y: number;
+
+  @ApiProperty()
+  username: string;
 }

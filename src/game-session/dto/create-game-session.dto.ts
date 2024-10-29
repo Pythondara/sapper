@@ -1,8 +1,16 @@
 import { UserProgressDto } from '../../dto';
-import { GameDto } from '../../game/dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateGameProgressDto {
+export class CreateGameSessionDto {
+  @ApiProperty()
+  @ValidateNested()
+  @Type(() => UserProgressDto)
   firstUserProgress: UserProgressDto;
+
+  @ApiProperty()
+  @ValidateNested()
+  @Type(() => UserProgressDto)
   secondUserProgress: UserProgressDto;
-  game: GameDto;
 }

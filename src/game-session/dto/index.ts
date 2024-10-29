@@ -1,2 +1,2 @@
-export * from './game-progress.dto';
-export * from './create-game-progress.dto';
+export * from './game-session.dto';
+export * from './create-game-session.dto';
