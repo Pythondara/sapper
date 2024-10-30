@@ -5169,6 +5169,11 @@ smart-buffer@^4.2.0:
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
 
+socket-io@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/socket-io/-/socket-io-1.0.0.tgz#fc566f4d30a6370224d07e65dcef386bd8f5d296"
+  integrity sha512-a+3SeSnMr6wdhiv0llX1Sv1GzWIJ8aa0P65N/9Ytlu43B5QRwgDiG0U1pRLB1YhvOmV4emimc6KTfmWSGIUSwg==
+
 socket.io-adapter@~2.5.2:
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-2.5.5.tgz#c7a1f9c703d7756844751b6ff9abfc1780664082"

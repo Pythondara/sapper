@@ -36,8 +36,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  console.log(envConfig.port, envConfig.host);
-
   await app.listen(envConfig.port, envConfig.host);
 }
 bootstrap();

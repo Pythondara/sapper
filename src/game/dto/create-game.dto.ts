@@ -4,17 +4,16 @@ import { Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateGameDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Lines count' })
+  @Min(1)
   @Max(6)
-  @Min(1)
-  fieldLineCount: number;
+  n: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Diamond count' })
   @Min(1)
-  @Max(36)
-  diamonds: number;
+  m: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Game Session' })
   @ValidateNested()
   @Type(() => CreateGameSessionDto)
   gameSession: CreateGameSessionDto;

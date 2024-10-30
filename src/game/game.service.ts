@@ -26,19 +26,9 @@ export class GameService {
     this.gameRepository = this.dataSource.getRepository(Game);
   }
 
-  async browse() {
-    this.logger.log({ message: 'Receiving a games....' });
-
-    const game = await this.gameRepository.find({
-      relations: ['gameSession'],
-    });
-
-    this.logger.log({ message: 'Games successfully received' });
-
-    return game;
-  }
-
   async hitCell(id: string, dto: HitDiamondDto) {
+    this.logger.log({ message: 'Hitting a cell...' });
+
     const game = await this.read(id);
 
     let userProgressData: UserProgressDataDto;
@@ -64,11 +54,58 @@ export class GameService {
 
     await this.gameSessionService.edit(game.gameSession, game.gameSession.id);
 
-    game.field[dto.x][dto.y].status = 'opened';
+    game.field = this.openCells(game.field, dto.x, dto.y);
+
+    this.logger.log({ message: 'Updating game entity....' });
+
+    this.logger.debug({ message: 'Updating game entity....', data: game });
 
     const updatedGame = await this.gameRepository.save(game);
 
+    this.logger.log({ message: 'Game updated successfully' });
+
+    this.logger.debug({ message: 'Game updated successfully', data: game });
+
     return updatedGame;
+  }
+
+  openCells(field: Array<Array<GameFieldDto>>, x: number, y: number) {
+    this.logger.log({ message: 'Opening cells...' });
+
+    if (x < 0 || y < 0 || x >= field.length || y >= field[0].length) {
+      return field;
+    }
+
+    if (field[x][y].value === true) {
+      const directions = [
+        { dx: -1, dy: 0 }, // вверх
+        { dx: 1, dy: 0 }, // вниз
+        { dx: 0, dy: -1 }, // влеов
+        { dx: 0, dy: 1 }, // вправо
+      ];
+
+      for (const { dx, dy } of directions) {
+        const newX = x + dx;
+        const newY = y + dy;
+
+        if (
+          newX >= 0 &&
+          newY >= 0 &&
+          newX < field.length &&
+          newY < field[0].length
+        ) {
+          if (field[newX][newY].value === false) {
+            field[newX][newY].status = 'opened';
+          }
+        }
+      }
+    }
+
+    this.logger.log({ message: 'Cells successfully opened' });
+
+    this.logger.debug({ message: 'Cells successfully opened', data: field });
+
+    return field;
   }
 
   setUserProgress(
@@ -76,6 +113,8 @@ export class GameService {
     dto: GameDto,
     coordinates: UserProgressMoveDto,
   ): UserProgressDataDto {
+    this.logger.log({ message: 'Set up user progress....' });
+
     let hitStatus: UserProgressStatusEnum;
     let moveQueue: number = 0;
     let diamondCount: number;
@@ -96,19 +135,33 @@ export class GameService {
       moveQueue = 1;
     }
 
-    return {
+    const res = {
       status: hitStatus,
       moveQueue,
       diamondCount,
       move: coordinates,
     };
+
+    this.logger.log({ message: 'User progress successfully setup' });
+
+    this.logger.debug({
+      message: 'User progress successfully setup',
+      data: res,
+    });
+
+    return res;
   }
 
   private generateField(lines: number, diamondsCount: number) {
+    this.logger.log({ message: 'Generating field....' });
+
     const field = Array.from({ length: lines }, () =>
       Array(lines).fill({ status: 'closed', value: false }),
     );
+
     const filledField = this.fillFieldWithDiamonds(field, diamondsCount, lines);
+
+    this.logger.log({ message: 'Field successfully generated' });
 
     return filledField;
   }
@@ -118,7 +171,9 @@ export class GameService {
     diamondsCount: number,
     lines: number,
   ) {
-    const placedDiamonds = new Set<any>(); // Используем Set для уникальности
+    this.logger.log({ message: 'Filling field with diamonds....' });
+
+    const placedDiamonds = new Set<any>();
     let diamonds = 0;
 
     while (diamonds < diamondsCount) {
@@ -133,7 +188,23 @@ export class GameService {
       }
     }
 
+    this.logger.log({ message: 'Field successfully filled' });
+
+    this.logger.debug({ message: 'Field successfully filled', data: field });
+
     return field;
+  }
+
+  async browse() {
+    this.logger.log({ message: 'Receiving a games....' });
+
+    const game = await this.gameRepository.find({
+      relations: ['gameSession'],
+    });
+
+    this.logger.log({ message: 'Games successfully received' });
+
+    return game;
   }
 
   async read(id: string, withDeleted = false) {
@@ -159,8 +230,6 @@ export class GameService {
 
     this.logger.debug({ message: 'Game successfully received', data: game });
 
-    console.log(game.field.length);
-
     return game;
   }
 
@@ -182,11 +251,11 @@ export class GameService {
 
     this.logger.debug({ message: 'Creating a game....', data: dto });
 
-    const field = this.generateField(dto.fieldLineCount, dto.diamonds);
+    const field = this.generateField(dto.n, dto.m);
 
     const game = new Game();
     game.field = field;
-    game.diamonds = dto.diamonds;
+    game.diamonds = dto.m;
     game.gameSession = gameSession;
 
     await this.gameRepository.save(game).catch((err) => {

@@ -4,12 +4,12 @@ import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateGameSessionDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Info about first user' })
   @ValidateNested()
   @Type(() => UserProgressDto)
   firstUserProgress: UserProgressDto;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Info about second user' })
   @ValidateNested()
   @Type(() => UserProgressDto)
   secondUserProgress: UserProgressDto;

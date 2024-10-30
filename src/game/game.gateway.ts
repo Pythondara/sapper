@@ -2,41 +2,50 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GameService } from './game.service';
-import { CreateGameDto, UpdateGameDto } from './dto';
+import { Socket, Server } from 'socket.io';
+import { CreateGameDto } from './dto';
+import { HitDiamondWebsocketDto } from './dto/websocket/hit-diamond.websocket.dto';
+import { Logger } from '@nestjs/common';
 
-@WebSocketGateway()
-export class GameGateway {
+@WebSocketGateway(8001, { cors: { origin: '*' } })
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(GameGateway.name);
+
   constructor(private readonly service: GameService) {}
+
+  @WebSocketServer() server: Server;
+
+  handleConnection(client: Socket) {
+    this.logger.log({ message: 'New user connected', data: client.id });
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log({ message: 'User disconnected', data: client.id });
+  }
 
   @SubscribeMessage('browseGames')
   async browse() {
     return this.service.browse();
   }
 
-  @SubscribeMessage('findOneGame')
-  async read(@MessageBody() id: string) {
-    return this.service.read(id);
-  }
-
-  @SubscribeMessage('editGame')
-  async edit(@MessageBody() dto: UpdateGameDto) {
-    return this.service.edit(dto);
-  }
-
   @SubscribeMessage('createGame')
   async add(@MessageBody() dto: CreateGameDto) {
-    return this.service.add(dto);
+    const gameEvent = await this.service.add(dto);
+
+    this.server.emit('gameCreated', { gameEvent });
+
+    return gameEvent;
   }
 
-  @SubscribeMessage('deleteGame')
-  async delete(@MessageBody() id: string) {
-    return this.service.delete(id);
-  }
+  @SubscribeMessage('hitCells')
+  async hitCells(@MessageBody() dto: HitDiamondWebsocketDto) {
+    const gameEvent = await this.service.hitCell(dto.id, dto);
 
-  @SubscribeMessage('restoreGame')
-  async restore(@MessageBody() id: string) {
-    return this.service.restore(id);
+    this.server.emit('cellsHit', { gameEvent });
   }
 }

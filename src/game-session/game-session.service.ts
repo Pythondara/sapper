@@ -120,8 +120,4 @@ export class GameSessionService {
 
     return gameSession;
   }
-
-  async delete(id: string) {}
-
-  async restore(id: string) {}
 }
