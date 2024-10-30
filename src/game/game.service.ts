@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { CreateGameDto, HitDiamondDto, GameDto, UpdateGameDto } from './dto';
+import { CreateGameDto, HitDiamondDto, GameDto } from './dto';
 import { DataSource, Repository } from 'typeorm';
 import { Game } from '../entities';
 import { GameSessionService } from '../game-session/game-session.service';
@@ -69,7 +69,7 @@ export class GameService {
     return updatedGame;
   }
 
-  openCells(field: Array<Array<GameFieldDto>>, x: number, y: number) {
+  private openCells(field: Array<Array<GameFieldDto>>, x: number, y: number) {
     this.logger.log({ message: 'Opening cells...' });
 
     if (x < 0 || y < 0 || x >= field.length || y >= field[0].length) {
@@ -108,7 +108,7 @@ export class GameService {
     return field;
   }
 
-  setUserProgress(
+  private setUserProgress(
     user: UserProgressDto,
     dto: GameDto,
     coordinates: UserProgressMoveDto,
@@ -231,10 +231,6 @@ export class GameService {
     this.logger.debug({ message: 'Game successfully received', data: game });
 
     return game;
-  }
-
-  async edit(dto: UpdateGameDto) {
-    return dto;
   }
 
   async add(dto: CreateGameDto): Promise<GameDto> {

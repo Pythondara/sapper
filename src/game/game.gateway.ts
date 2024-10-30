@@ -28,6 +28,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log({ message: 'User disconnected', data: client.id });
   }
 
+  // TODO Доавбить комнаты для пользователей, чтобы ивенты отправлялись только участникам комнат
+
   @SubscribeMessage('browseGames')
   async browse() {
     return this.service.browse();
@@ -41,6 +43,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     return gameEvent;
   }
+
+  // TODO проработать механизм взаимодействия с сокетами и отправкой ивентов
 
   @SubscribeMessage('hitCells')
   async hitCells(@MessageBody() dto: HitDiamondWebsocketDto) {
